@@ -6,12 +6,12 @@ import sys, os
 # Add src to path so DAGs can import ml_pipeline
 sys.path.append(os.path.join(os.path.dirname(__file__), "../src"))
 
-from ml_pipeline.breast_cancer import train_model, eval_model, promote_model
+from ml_pipeline.breast_cancer import train_model, eval_model, promote_model, sqs_queue
 
 default_args = {"owner": "airflow", "retries": 1}
 
 with DAG(
-    dag_id="ml_training_pipeline_v2",
+    dag_id="ml_training_pipeline",
     default_args=default_args,
     description="Pipeline: train,evaluate and promote model",
     schedule_interval=None,
@@ -34,5 +34,10 @@ with DAG(
         task_id="promote_model",
         python_callable=promote_model,
     )
+    
+    queue_task = PythonOperator(
+        task_id="sqs_queue",
+        python_callable=sqs_queue,
+    )
 
-    train_task >> eval_task >> promote_task
+    train_task >> eval_task >> promote_task >> queue_task

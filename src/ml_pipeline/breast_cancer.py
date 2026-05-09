@@ -2,6 +2,7 @@ import os
 import json
 import joblib
 import boto3
+import io
 from datetime import datetime
 from sklearn.datasets import load_breast_cancer
 from sklearn.linear_model import LogisticRegression
@@ -12,7 +13,7 @@ model_path = "models/cancer_model.pkl"
 metrics_path = "models/metrics.json"
 metadata_path = "models/metadata.json"
 testdata_path = "models/test_data.pkl"
-s3_bucket = "mlops-breastcancer"
+s3_bucket = "mlops-final-project331"
 
 
 def train_model():
@@ -32,6 +33,10 @@ def train_model():
     joblib.dump((X_test, y_test), testdata_path)
     print(f"test data saved to {testdata_path}")
     
+    #  upload test data to S3 for Airflow
+    s3 = boto3.client("s3")
+    s3.upload_file(testdata_path, s3_bucket, "data/test_data.pkl")
+    print(f"[train_model] upload test data to s3://{s3_bucket}/data/test_data.pkl")
 
 def eval_model():
     clf = joblib.load(model_path)
@@ -83,5 +88,31 @@ def promote_model():
     for local_path, s3_key in artifacts:
         s3.upload_file(local_path, s3_bucket, s3_key)
         print(f"[promote_model] uploaded to s3://{s3_bucket}/{s3_key}")
-            
+        
+    s3.upload_file(model_path, s3_bucket, "models/latest/model.pkl")
+    print(f"[promote_model] uploaded to s3://{s3_bucket}/models/latest/model.pkl")
+    
     print("[promote_model] Promotion complete.")
+
+def sqs_queue():
+    QUEUE_URL = "https://sqs.<region>.amazonaws.com/<account-id>/<queue-name>"
+
+    s3 = boto3.client("s3")
+    sqs = boto3.client("sqs")
+
+    obj = s3.get_object(Bucket=s3_bucket, Key="data/test_data.pkl")
+    X_test, _ = joblib.load(io.BytesIO(obj["Body"].read()))
+    print(f"[sqs_queue] Loaded {len(X_test)} test data from S3.")
+
+    if len(X_test) == 0:
+        raise ValueError("[sqs_queue] No test data found in S3. Aborting SQS send.")
+
+    for i, features in enumerate(X_test):
+        msg = {
+            "record_id": f"test_data{i:03d}",
+            "features": features.tolist()
+        }
+        sqs.send_message(QueueUrl=QUEUE_URL, MessageBody=json.dumps(msg))
+        print(f"[sqs_queue] Sent {i + 1}/{len(X_test)}")
+
+    print(f"[sqs_queue] Done. {len(X_test)} sample sent to SQS.")
