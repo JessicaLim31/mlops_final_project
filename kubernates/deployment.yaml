@@ -17,7 +17,7 @@ spec:
           image: YOUR_ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/sqs-consumer:latest
           env:
             - name: QUEUE_URL
-              value: "https://sqs.us-east-1.amazonaws.com/YOUR_ACCOUNT/your-queue"
+              value: "https://sqs.us-east-1.amazonaws.com/701262207008/test_queue"
 
             - name: S3_BUCKET
               value: "mlops-final-project331"
