@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: consumer
-        #Insert info Format: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/<REPO_NAME>:latest
+        #Update with ECR image URL Format: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/<REPO_NAME>:latest
           image: 701262207008.dkr.ecr.us-east-1.amazonaws.com/sqs-consumer:latest 
           env:
             - name: QUEUE_URL
