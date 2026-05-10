@@ -3,18 +3,20 @@ import json
 import joblib
 import boto3
 import io
+import sys 
 from datetime import datetime
 from sklearn.datasets import load_breast_cancer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "../../"))
+from config import S3_BUCKET, QUEUE_URL
+
 model_path = "models/cancer_model.pkl"
 metrics_path = "models/metrics.json"
 metadata_path = "models/metadata.json"
 testdata_path = "models/test_data.pkl"
-s3_bucket = "mlops-final-project331"
-
 
 def train_model():
     os.makedirs("models", exist_ok=True)
@@ -35,8 +37,8 @@ def train_model():
     
     #  upload test data to S3 for Airflow
     s3 = boto3.client("s3")
-    s3.upload_file(testdata_path, s3_bucket, "data/test_data.pkl")
-    print(f"[train_model] upload test data to s3://{s3_bucket}/data/test_data.pkl")
+    s3.upload_file(testdata_path, S3_BUCKET, "data/test_data.pkl")
+    print(f"[train_model] upload test data to s3://{S3_BUCKET}/data/test_data.pkl")
 
 def eval_model():
     clf = joblib.load(model_path)
@@ -86,21 +88,20 @@ def promote_model():
     ]
     
     for local_path, s3_key in artifacts:
-        s3.upload_file(local_path, s3_bucket, s3_key)
-        print(f"[promote_model] uploaded to s3://{s3_bucket}/{s3_key}")
+        s3.upload_file(local_path, S3_BUCKET, s3_key)
+        print(f"[promote_model] uploaded to s3://{S3_BUCKET}/{s3_key}")
         
-    s3.upload_file(model_path, s3_bucket, "models/latest/model.pkl")
-    print(f"[promote_model] uploaded to s3://{s3_bucket}/models/latest/model.pkl")
+    s3.upload_file(model_path, S3_BUCKET, "models/latest/model.pkl")
+    print(f"[promote_model] uploaded to s3://{S3_BUCKET}/models/latest/model.pkl")
     
     print("[promote_model] Promotion complete.")
 
 def sqs_queue():
-    QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/701262207008/test-queue"
 
     s3 = boto3.client("s3")
     sqs = boto3.client("sqs")
 
-    obj = s3.get_object(Bucket=s3_bucket, Key="data/test_data.pkl")
+    obj = s3.get_object(Bucket=S3_BUCKET, Key="data/test_data.pkl")
     X_test, _ = joblib.load(io.BytesIO(obj["Body"].read()))
     print(f"[sqs_queue] Loaded {len(X_test)} test data from S3.")
 
