@@ -1,6 +1,6 @@
 import os
 
-QUEUE_URL = os.getenv("QUEUE_URL", "https://sqs.us-east-1.amazonaws.com/701262207008/test_queue") # Enter your queue URL
+QUEUE_URL = os.getenv("QUEUE_URL", "https://sqs.us-east-1.amazonaws.com/701262207008/test-queue") # Enter your queue URL
 
 S3_BUCKET = os.getenv("S3_BUCKET", "mlops-final-project331")
 S3_MODEL_KEY = "models/latest/model.pkl"
