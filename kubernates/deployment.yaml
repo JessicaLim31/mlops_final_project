@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sqs-consumer
+  name: sqs-consumer # Update with ECR repo name
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: sqs-consumer
+      app: sqs-consumer # Update with ECR repo name
   template:
     metadata:
       labels:
-        app: sqs-consumer
+        app: sqs-consumer # Update with ECR repo name
     spec:
       containers:
         - name: consumer
