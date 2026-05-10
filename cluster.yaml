@@ -1,12 +1,15 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
-
 metadata:
   name: inference-cluster
   region: us-east-1
 
 iam:
   serviceRoleARN: arn:aws:iam::701262207008:role/LabRole
+  withOIDC: false
+
+autoModeConfig:
+  enabled: false
 
 managedNodeGroups:
   - name: workers

@@ -95,7 +95,7 @@ def promote_model():
     print("[promote_model] Promotion complete.")
 
 def sqs_queue():
-    QUEUE_URL = "https://sqs.<region>.amazonaws.com/<account-id>/<queue-name>"
+    QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/701262207008/test-queue"
 
     s3 = boto3.client("s3")
     sqs = boto3.client("sqs")
