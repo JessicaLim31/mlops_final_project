@@ -101,7 +101,7 @@ cd mlops_final_project
 ``
 - Update your account ID
 ```
-sed -i 's/701262207008/YOUR_ACTUAL_ACCOUNT_ID/' ~/mlops_final_project/setup_eks.sh
+sed -i 's/<account number>/YOUR_ACTUAL_ACCOUNT_ID/' ~/mlops_final_project/setup_eks.sh
 ```
 
 - Run the setup script
@@ -183,21 +183,21 @@ kubectl scale deployment sqs-consumer --replicas=2
 
 Delete EKS cluster
 ```
-eksctl delete cluster --name inference-cluster --region us-east-1
+eksctl delete cluster --name <cluster name> --region us-east-1
 ```
 Stop ECS service
 ```
-aws ecs update-service --cluster final-consumer-cluster \
+aws ecs update-service --cluster <cluster name> \
   --service consumer-service --desired-count 0
 ```
 Delete ECR repository
 ```
-aws ecr delete-repository --repository-name final-consumer \
+aws ecr delete-repository --repository-name <repo name> \
   --region us-east-1 --force
 ```
 
 Purge SQS queue
 ```
 aws sqs purge-queue \
-  --queue-url https://sqs.us-east-1.amazonaws.com/701262207008/test-queue
+  --queue-url https://sqs.us-east-1.amazonaws.com/<Account number>/test-queue
 ```
