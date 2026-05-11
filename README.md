@@ -46,7 +46,7 @@ We use **one virtual environment** for all labs.
 
 ```
 python3.12 -m venv .venv
-source ./venvs/bin/activate
+source .venv/bin/activate
 ```
 
 2. Install dependencies:
