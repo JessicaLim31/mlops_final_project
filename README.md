@@ -95,10 +95,11 @@ pip install -r requirements.txt
 ⚠️ Note: Use AWS CloudShell for EKS - Cloud 9 will expire during cluster creation
 
 - In CloudShell
-``
-git clone  git@github.com:JessicaLim31/mlops_final_project.git
+```
+git clone https://github.com/JessicaLim31/mlops_final_project.git
 cd mlops_final_project
-``
+```
+
 - Update your account ID
 ```
 sed -i 's/<account number>/YOUR_ACTUAL_ACCOUNT_ID/' ~/mlops_final_project/setup_eks.sh
@@ -116,7 +117,7 @@ chmod +x setup_eks.sh
 - Run the setup script:
 
 ```
-source./setup_airflow.sh
+source ./setup_airflow.sh
 ```
 - Create User
 
@@ -133,13 +134,15 @@ airflow users create \
 
 - Start Airflow
 ```
+source ./setup_airflow.sh
 airflow webserver --port 8080
 ```
 
 - Open Another Terminal, run scheduler
 ```
 cd mlops_final_project
-source./setup_airflow.sh
+source .venv/bin/activate
+source ./setup_airflow.sh
 airflow scheduler
 ```
 - Then visit http://<your_ip_address>:8080
